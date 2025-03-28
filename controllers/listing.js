@@ -56,9 +56,10 @@ module.exports.createListing = async (req,res,next)=>{
 module.exports.editListing = async (req,res)=>{
     let {id} = req.params;
     const listing = await Listing.findById(id);
+    const coordinates = listing.geometry.coordinates;
     let originalImgUrl = listing.image.url;
     originalImgUrl.replace = ("/upload","/upload/w_250"); 
-    res.render("listings/edit.ejs",{listing,originalImgUrl});
+    res.render("listings/edit.ejs",{listing,originalImgUrl,coordinates});
 }
 //SEARCH ROUTE 
 module.exports.searchListings = async (req, res, next) => {
@@ -102,6 +103,18 @@ module.exports.searchListings = async (req, res, next) => {
 module.exports.updateListing = async (req, res) => {
     const { id } = req.params;
     // const listing = await Listing.findById(id);
+    
+    // Get coordinates for new location if location changed
+    if (req.body.listing.location) {
+        let response = await geocodingClient.forwardGeocode({
+            query: req.body.listing.location,
+            limit: 1,
+        }).send();
+
+        if (response.body.features.length > 0) {
+            req.body.listing.geometry = response.body.features[0].geometry;
+        }
+    }
     let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing },{ new: true });
     if(typeof req.file !== "undefined"){
         let url = req.file.path;

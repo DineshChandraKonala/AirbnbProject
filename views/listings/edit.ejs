@@ -47,5 +47,15 @@
         
         <button class="btn btn-dark edit-btn mt-3"type="submit">Edit</button>
     </form>
+    <!-- Add map container and scripts here -->
+<div class="mb-3">
+    <label class="form-label">Location on Map</label>
+    <div id="map" style="height: 400px; width: 100%; border-radius: 0.5rem;"></div>
+</div>
+<script>
+    const listing = <%- JSON.stringify(listing) %>;
+    const mapToken = '<%= process.env.MAP_TOKEN %>';
+</script>
+<script src="/js/map.js"></script>
         </div>
     </div>
